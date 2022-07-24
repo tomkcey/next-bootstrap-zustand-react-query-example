@@ -1,34 +1,32 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Before running the program
 
-## Getting Started
+- Make sure you have a `.env` file at root with the following key/values.
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
+```env
+NEXT_PUBLIC_CANONICAL_URI="http://localhost:3000"
+NEXT_PUBLIC_STARSHIP_ENDPOINT="/api/v1/starships"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Things to look for
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+- State management with `zustand`. See how the state is shared between two 'same-level' components (in `/pages/index.tsx`) without drilling them from above and how the "boilerplate" is in fact so small it shouldn't really be called boilerplate.
+- `WrappedAxiosResponse<T>` that's in fact merely an extension of the `AxiosResponse<T>` type from `axios` to which we added the `unwrap` function that's essentially an accessor for its `data` property. It's fluff, but interesting since we won't have to potentially chain `axiosResponse.data?.data` calls which might get confusing, or even `x?.data?.data?.data` if the axios response itself was wrapped. We can merely call `axiosResponse.unwrap()` and the fetched data will be revealed. Looking forward it's possible to extract this type as straight up `Wrapper<T>` so it can be attached to other types that would have the same reasoning for accessing the required resource as `axios`.
+- A bit of directory sexiness. Even this one could use a bit of love but overall it's purposeful. Take, for example, the `utils` folder, where utility functions and variables are stored. Even services/clients like the http client or the validator are stored there, but these could very well be in the `shared` folder. Talking of the `shared` folder, see how it's domain-driven and thus both the frontend and backend can pull the `Starship` models from there? There's also a `'*.test-utils.ts'` file in there. Obviously whatever is inside serves only our tests.
+- `/utils/links.ts` is one take on pagination-tracking. The backend sets the `link` HTTP header and clients can parse it and simply feed that to their http client url when jumping pages. See how it's done with `react-query` in `/pages/index.tsx`, in tandem with the `zustand` state management.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+# Running on machine
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- `yarn`
+- `yarn dev`
 
-## Learn More
+If weird things happen, welcome to Next.js. Just stop the program, execute `yarn build`, then execute `yarn dev` again.
 
-To learn more about Next.js, take a look at the following resources:
+# Running containerized
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `yarn docker:build`
+- `yarn docker:run`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Disclaimer
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- There might be remnants/artifacts lying around that don't serve rthe purpose of the showcase. If you stumble on one, ignore it.
+- The backend is basically mock/stub data. A generator function generates a bunch of starships, filters them on a need-to basis, generates the `link` header and serves the response.
