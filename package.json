@@ -2,12 +2,13 @@
   "name": "next-bootstrap-zustand-react-query-example",
   "version": "0.1.0",
   "private": false,
+  "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "docker:build": "docker build -t next-bootstrap-zustand-react-query-example .",
-    "docker:run": "docker run --env-file=./.env.local -p 3000:3000 -it next-bootstrap-zustand-react-query-example"
+    "docker:run": "docker run -p 3000:3000 -it next-bootstrap-zustand-react-query-example"
   },
   "dependencies": {
     "axios": "^0.27.2",
